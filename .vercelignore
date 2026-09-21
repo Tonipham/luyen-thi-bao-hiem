@@ -1,0 +1,13 @@
+# Bỏ qua các file chạy local trên máy tính (Python server, tài liệu gốc)
+server.py
+requirements.txt
+scripts/
+Tài liệu/
+*.bat
+
+# Bỏ qua môi trường ảo và cấu hình IDE
+.venv/
+env/
+venv/
+.vscode/
+.idea/
