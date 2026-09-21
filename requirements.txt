@@ -1,0 +1,3 @@
+# Thư viện phục vụ trích xuất câu hỏi từ file PDF (chỉ cần khi chạy scripts/extract_questions.py)
+# Ứng dụng web server (server.py) dùng thư viện chuẩn có sẵn của Python, không cần cài thêm gói nào.
+pymupdf>=1.23.0

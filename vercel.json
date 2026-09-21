@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/", "destination": "/src/index.html" },
+    { "source": "/css/(.*)", "destination": "/src/css/$1" },
+    { "source": "/js/(.*)", "destination": "/src/js/$1" },
+    { "source": "/api/questions", "destination": "/data/questions.json" }
+  ]
+}
