@@ -39,7 +39,7 @@ Nếu máy tính mới chưa có Python, thực hiện theo các bước sau:
 2. 💡 **Lưu ý tối ưu dung lượng**:
    - **NÊN BỎ QUA** thư mục `.venv` khi copy hoặc nén zip (nếu có).
    - Thư mục `.venv` chứa môi trường ảo của máy cũ với các đường dẫn tuyệt đối riêng biệt và dung lượng lớn, không cần thiết để chạy ứng dụng trên máy mới.
-   - Ngân hàng đề thi 446 câu đã nằm trọn vẹn trong file `data/questions.json`.
+   - Ngân hàng đề thi 846 câu đã nằm trọn vẹn trong file `data/questions.json`.
 
 ---
 

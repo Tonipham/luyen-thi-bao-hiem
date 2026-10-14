@@ -37,7 +37,7 @@ git branch -M main
 REM 4. Thêm files và tạo commit
 echo [4/5] Đang gom file và tạo commit...
 git add .
-git commit -m "Upload source ung dung luyen thi bao hiem"
+git commit -m "feat: Bo sung 400 cau hoi MGBDS va tinh chinh giao dien mac dinh khong chon de" || echo [Thong tin] Cac thay doi da duoc commit san.
 
 REM 5. Đẩy code lên GitHub
 echo [5/5] Đang đẩy mã nguồn lên GitHub...

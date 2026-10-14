@@ -27,8 +27,8 @@ async function runTests() {
   console.log(`[Test 2] GET /api/questions -> Status ${apiRes.status}`);
   const data = JSON.parse(apiRes.body);
   console.log(`         Tổng số câu hỏi trong ngân hàng: ${data.total}`);
-  if (data.total !== 446) {
-    throw new Error(`Test 2 Thất bại: Mong đợi 446 câu hỏi, nhận được ${data.total}`);
+  if (data.total !== 846) {
+    throw new Error(`Test 2 Thất bại: Mong đợi 846 câu hỏi, nhận được ${data.total}`);
   }
 
   // Test 3: Static CSS & JS Assets

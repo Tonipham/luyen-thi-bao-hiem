@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Hệ thống thi trắc nghiệm trực tuyến phong cách Google Forms, tự động chấm điểm, hướng dẫn và dẫn chứng tài liệu cho câu sai.">
-  <title>Luyện Thi Trắc Nghiệm Bảo Hiểm | Google Forms Style</title>
+  <title>Luyện Thi Trắc Nghiệm Bất Động Sản & Bảo Hiểm | Google Forms Style</title>
   
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,11 +24,11 @@
         <div class="brand-icon">📝</div>
         <div class="brand-text">
           <h1>Luyện Thi Trắc Nghiệm</h1>
-          <p>Chứng chỉ Đại lý Bảo hiểm Nhân thọ</p>
+          <p>Chứng chỉ Môi giới BĐS & Đại lý Bảo hiểm</p>
         </div>
       </a>
       <div class="header-actions">
-        <span class="badge-source" id="total-available-badge">446 câu khả dụng</span>
+        <span class="badge-source" id="total-available-badge">0 câu khả dụng</span>
       </div>
     </div>
   </header>
@@ -46,17 +46,19 @@
         <div class="g-card-top-accent"></div>
         <div class="g-card-body">
           <h2 style="font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px;">
-            Thi Thử Chứng Chỉ Bảo Hiểm
+            Ôn Thi Chứng Chỉ Môi Giới BĐS & Bảo Hiểm
           </h2>
           <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
-            Hệ thống tổng hợp toàn bộ ngân hàng câu hỏi chuẩn từ tài liệu ôn thi. Mỗi câu sai sau khi nộp bài sẽ có <strong>căn cứ pháp lý, giải thích chi tiết và tài liệu tham khảo</strong> để bạn ôn tập lại.
+            Hệ thống tổng hợp toàn bộ ngân hàng câu hỏi chuẩn từ tài liệu ôn thi <strong>Môi giới Bất động sản</strong> (400 câu: Phần Cơ sở & Chuyên môn) và <strong>Đại lý Bảo hiểm</strong> (446 câu: Pháp luật & Nghiệp vụ). Mỗi câu sai sau khi nộp bài sẽ có <strong>dẫn chứng tài liệu, số trang và đáp án chuẩn hóa</strong> để ôn tập lại.
           </p>
           <div style="display: flex; gap: 10px; flex-wrap: wrap; font-size: 0.82rem; color: var(--text-muted);">
             <span>⏱️ Tính giờ làm bài tự động</span>
             <span>•</span>
-            <span>⚖️ Dẫn chứng điều luật chính xác</span>
+            <span>🏠 400 câu Môi giới Bất động sản</span>
             <span>•</span>
-            <span>🧠 Có mẹo ghi nhớ ôn thi</span>
+            <span>🛡️ 446 câu Đại lý Bảo hiểm</span>
+            <span>•</span>
+            <span>📚 Dẫn chứng số trang chính xác</span>
           </div>
         </div>
       </div>
@@ -69,12 +71,13 @@
           <div class="form-group">
             <label class="form-label" for="input-num-questions">1. Số lượng câu hỏi cần thi</label>
             <div class="form-sublabel">Chọn số lượng câu hỏi bạn muốn làm trong đề thi:</div>
-            <input type="number" id="input-num-questions" class="form-input" value="30" min="1" max="446">
+            <input type="number" id="input-num-questions" class="form-input" value="0" min="1" max="846" placeholder="Tích chọn bộ đề bên dưới để bắt đầu">
             <div class="preset-group">
               <button type="button" class="preset-pill" data-num="10">10 câu</button>
               <button type="button" class="preset-pill" data-num="20">20 câu</button>
-              <button type="button" class="preset-pill active" data-num="30">30 câu (Chuẩn thi)</button>
+              <button type="button" class="preset-pill" data-num="30">30 câu (Chuẩn thi)</button>
               <button type="button" class="preset-pill" data-num="40">40 câu</button>
+              <button type="button" class="preset-pill" data-num="50">50 câu</button>
               <button type="button" class="preset-pill" data-num="all">Tất cả ngân hàng câu hỏi</button>
             </div>
           </div>
@@ -95,7 +98,12 @@
 
           <!-- Input 3: Topic Selection Filter -->
           <div class="form-group">
-            <label class="form-label">3. Chọn nội dung / Tài liệu ôn tập</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+              <label class="form-label" style="margin-bottom: 0;">3. Chọn nội dung / Tài liệu ôn tập</label>
+              <div class="topic-quick-filters" id="topic-quick-filters">
+                <!-- Quick filter pills rendered dynamically -->
+              </div>
+            </div>
             <div class="form-sublabel">Tích chọn các phần tài liệu bạn muốn đưa vào đề thi:</div>
             <div class="topic-list" id="topic-list-container">
               <!-- Rendered dynamically by app.js -->
@@ -204,7 +212,7 @@
 
   <!-- Footer -->
   <footer class="site-footer">
-    <p>© Ứng dụng ôn luyện trắc nghiệm chuẩn hóa • Dữ liệu trích xuất từ 6 tài liệu ôn thi Luật KDBH & Nghiệp vụ</p>
+    <p>© Ứng dụng ôn luyện trắc nghiệm chuẩn hóa • 846 câu hỏi từ 8 tài liệu ôn thi Môi giới BĐS & Bảo hiểm</p>
   </footer>
 
   <!-- Scripts -->

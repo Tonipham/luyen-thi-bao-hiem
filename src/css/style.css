@@ -369,6 +369,59 @@ body {
   border-radius: var(--radius-full);
 }
 
+/* Topic Category & Quick Filter Styles */
+.topic-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.topic-filter-btn {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.topic-filter-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.topic-filter-btn.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+}
+
+.topic-category-group {
+  margin-bottom: 14px;
+}
+
+.topic-category-title {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 4px;
+  border-bottom: 1.5px dashed rgba(103, 58, 183, 0.2);
+}
+
+.topic-category-count {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
 /* ==========================================================================
    MODAL DIALOG
    ========================================================================== */

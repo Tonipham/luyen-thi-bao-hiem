@@ -1,11 +1,11 @@
-# Ứng Dụng Thi Trắc Nghiệm Ôn Thi Chứng Chỉ Bảo Hiểm (Google Forms Style)
+# Ứng Dụng Thi Trắc Nghiệm Môi Giới BĐS & Bảo Hiểm (Google Forms Style)
 
-Hệ thống web thi trắc nghiệm chạy local phục vụ ôn thi chứng chỉ bảo hiểm nhân thọ, tự động trích xuất ngân hàng câu hỏi chuẩn từ tài liệu PDF, tính giờ làm bài, chấm điểm và đưa ra dẫn chứng, căn cứ pháp lý, mẹo ghi nhớ cho các câu trả lời sai.
+Hệ thống web thi trắc nghiệm chạy local phục vụ ôn thi chứng chỉ Môi giới Bất động sản (MGBĐS) và Đại lý Bảo hiểm Nhân thọ, tự động trích xuất ngân hàng câu hỏi chuẩn từ tài liệu PDF, tính giờ làm bài, chấm điểm và đưa ra dẫn chứng, căn cứ pháp lý, mẹo ghi nhớ cho các câu trả lời sai.
 
 ---
 
 ## ⏱️ THÔNG TIN PHÁT TRIỂN & ĐÓNG GÓI
-- **Thời lượng triển khai hoàn thành**: ~30 phút (từ tiếp nhận tài liệu PDF, bóc tách dữ liệu đến hoàn thiện toàn bộ giao diện và kiểm thử).
+- **Ngân hàng câu hỏi**: **846 câu hỏi** trích xuất từ 8 file PDF chuẩn (400 câu Môi giới BĐS + 446 câu Đại lý Bảo hiểm).
 - **Công nghệ sử dụng**: Python (PyMuPDF, HTTP Server) + Vanilla HTML5/CSS3/JavaScript (không phụ thuộc thư viện nặng bên ngoài).
 - **Trạng thái đóng gói**: Hoàn thiện 100%, kiểm thử đạt chuẩn.
 
@@ -16,19 +16,19 @@ Hệ thống web thi trắc nghiệm chạy local phục vụ ôn thi chứng ch
 2. Trình duyệt web sẽ tự động mở trang thi tại địa chỉ:
    👉 **http://localhost:8000**
 
-> 📖 **Xem hướng dẫn chi tiết cài đặt trên máy tính mới tại**: [HUONG_DAN_CAI_DAT.md](file:///g:/Other%20computers/My%20Computer/Projects/Personal/App%20as%20Google%20Forms/HUONG_DAN_CAI_DAT.md)
-
 ---
 
 ## 🌟 CÁC TÍNH NĂNG CHÍNH
-1. **Ngân hàng câu hỏi trọn vẹn (446 câu)**:
-   - Trích xuất tự động từ 6 file PDF ôn thi trong thư mục `Tài liệu/`.
-   - Đáp án đúng được nhận diện tự động qua chữ in đậm tô đỏ (`#c00000`).
-   - Đã lọc sạch toàn bộ các ký tự tick mark (`✔`, `✓`, `☑`) để đảm bảo tính khách quan khi làm bài.
-2. **Thiết lập đề thi linh hoạt**:
-   - Nhập số lượng câu hỏi tùy chỉnh hoặc chọn nhanh (10, 20, 30, 40 câu, hoặc Tất cả 446 câu).
-   - Tùy chỉnh thời gian thi (phút) kèm bộ đếm ngược trực quan.
-   - Bộ lọc theo chủ đề (chọn thi tất cả hoặc chỉ chọn một số phần tài liệu cụ thể).
+1. **Ngân hàng câu hỏi đa dạng (846 câu)**:
+   - **🏠 Môi giới Bất động sản (400 câu)**:
+     - 200 câu hỏi Phần Kiến thức Cơ sở (`200 Câu hỏi trắc nghiệm MGBĐS - Phần cơ sở.pdf`)
+     - 200 câu hỏi Phần Kiến thức Chuyên môn (`200 Câu hỏi trắc nghiệm MGBĐS - Phần chuyên môn.pdf`)
+   - **🛡️ Đại lý Bảo hiểm Nhân thọ (446 câu)**:
+     - 6 phần tài liệu Luật KDBH, Thuật ngữ, Nghiệp vụ, Kênh phân phối, Tính toán (`P1..P5`).
+   - Đã lọc sạch 100% các ký tự tick mark (`✔`, `✓`, `☑`) để đảm bảo tính khách quan khi làm bài.
+2. **Bộ lọc danh mục thông minh**:
+   - Nút chọn nhanh: **"✨ Tất cả (846 câu)"**, **"🏠 Chỉ BĐS (400 câu)"**, **"🛡️ Chỉ Bảo hiểm (446 câu)"**, **"❌ Bỏ chọn"**.
+   - Tùy chọn linh hoạt số lượng câu hỏi và thời gian làm bài đếm ngược.
 3. **Giao diện thi chuẩn Google Forms**:
    - Thanh trạng thái ghim cố định hiển thị thời gian và tiến độ làm bài.
    - Bảng câu hỏi (Question Matrix) trực quan: Chưa làm (trắng), Đã làm (xanh/tím), Đặt cờ (vàng). Bấm vào để cuộn nhanh đến câu tương ứng.
@@ -38,10 +38,8 @@ Hệ thống web thi trắc nghiệm chạy local phục vụ ôn thi chứng ch
    - Bảng điểm chi tiết (tỷ lệ %, đánh giá ĐẠT/CHƯA ĐẠT theo ngưỡng 75%).
    - Tab "Chỉ xem câu làm sai" để tập trung ôn tập lỗ hổng kiến thức.
    - Mỗi câu sai có **Hộp Dẫn Chứng & Hướng Dẫn**:
-     - 📄 **Tài liệu nguồn**: Tên file PDF và số trang cụ thể (ví dụ: `P1_ThuatNgu_NguyenTac_BoSung.pdf - Trang 14`).
-     - ⚖️ **Căn cứ pháp lý**: Trích dẫn điều luật, nghị định, thông tư chính xác.
-     - 💡 **Giải thích chi tiết**: Hướng dẫn cặn kẽ vì sao đáp án đó đúng.
-     - 🧠 **Mẹo ghi nhớ**: Tips ôn thi thực chiến.
+     - 📄 **Tài liệu nguồn**: Tên file PDF và số trang cụ thể.
+     - ⚖️ **Căn cứ pháp lý / Đáp án**: Căn cứ pháp lý, giải thích chi tiết và đáp án chuẩn hóa.
 5. **Luyện lại câu sai**:
    - Nút **"🔁 Luyện lại câu sai"** tạo ngay đề thi mới CHỈ gồm các câu bạn vừa làm sai để khắc sâu kiến thức.
    - Nút **"🖨️ In kết quả ôn tập"** để lưu lại dạng PDF học bài offline.
@@ -62,7 +60,7 @@ App as Google Forms/
 │   ├── extract_questions.py   # Script trích xuất câu hỏi từ PDF -> JSON
 │   └── test_app.js            # Script kiểm thử tự động toàn bộ luồng
 ├── data/
-│   └── questions.json         # Dữ liệu chuẩn 446 câu hỏi
+│   └── questions.json         # Dữ liệu chuẩn 846 câu hỏi
 ├── src/
 │   ├── index.html             # Giao diện chính phong cách Google Forms
 │   ├── css/
@@ -72,5 +70,5 @@ App as Google Forms/
 │       ├── timer.js           # Bộ đếm ngược và kiểm soát hết giờ
 │       ├── review.js          # Module chấm điểm và tạo thẻ dẫn chứng
 │       └── app.js             # Quản lý trạng thái và luồng bài thi
-└── Tài liệu/                  # 6 file tài liệu PDF gốc
+└── Tài liệu/                  # 8 file tài liệu PDF gốc (BĐS & Bảo hiểm)
 ```
