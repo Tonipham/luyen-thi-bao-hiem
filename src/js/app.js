@@ -85,8 +85,6 @@ function renderSetupTopics() {
   if (!elements.topicListContainer) return;
 
   const topicEntries = Object.entries(state.topics);
-  // Default: NO topic selected (user chooses manually)
-  state.selectedTopics.clear();
 
   // Filter only MGBĐS topics
   const bdsTopics = [];
@@ -106,15 +104,19 @@ function renderSetupTopics() {
     return 0;
   });
 
+  // Default: SELECT ALL visible MGBĐS topics
+  state.selectedTopics.clear();
+  bdsTopics.forEach(t => state.selectedTopics.add(t.file));
+
   const bdsTotal = bdsTopics.reduce((sum, t) => sum + t.count, 0);
 
   // Render quick filter buttons for MGBĐS
   if (elements.topicQuickFilters) {
     elements.topicQuickFilters.innerHTML = `
-      <button type="button" class="topic-filter-btn" data-filter="all">✨ Cả 2 phần (${bdsTotal} câu)</button>
+      <button type="button" class="topic-filter-btn active" data-filter="all">✨ Cả 2 phần (${bdsTotal} câu)</button>
       <button type="button" class="topic-filter-btn" data-filter="cs">📘 Phần Cơ sở (200 câu)</button>
       <button type="button" class="topic-filter-btn" data-filter="cm">📙 Phần Chuyên môn (200 câu)</button>
-      <button type="button" class="topic-filter-btn active" data-filter="none">❌ Bỏ chọn</button>
+      <button type="button" class="topic-filter-btn" data-filter="none">❌ Bỏ chọn</button>
     `;
 
     elements.topicQuickFilters.querySelectorAll('.topic-filter-btn').forEach(btn => {
@@ -197,6 +199,13 @@ function renderSetupTopics() {
       // Update quick filter buttons active state
       if (elements.topicQuickFilters) {
         elements.topicQuickFilters.querySelectorAll('.topic-filter-btn').forEach(b => b.classList.remove('active'));
+        if (state.selectedTopics.size === bdsTopics.length) {
+          const allBtn = elements.topicQuickFilters.querySelector('[data-filter="all"]');
+          if (allBtn) allBtn.classList.add('active');
+        } else if (state.selectedTopics.size === 0) {
+          const noneBtn = elements.topicQuickFilters.querySelector('[data-filter="none"]');
+          if (noneBtn) noneBtn.classList.add('active');
+        }
       }
       updateAvailableQuestionsCount();
     });
