@@ -80,7 +80,7 @@ async function initApp() {
   }
 }
 
-// Render topic checkboxes in Setup screen with categories and quick filters
+// Render topic checkboxes in Setup screen (showing only MGBĐS topics)
 function renderSetupTopics() {
   if (!elements.topicListContainer) return;
 
@@ -88,29 +88,33 @@ function renderSetupTopics() {
   // Default: NO topic selected (user chooses manually)
   state.selectedTopics.clear();
 
-  // Categorize topics
+  // Filter only MGBĐS topics
   const bdsTopics = [];
-  const bhTopics = [];
-
   topicEntries.forEach(([file, count]) => {
     const norm = (file || '').normalize('NFC').toLowerCase();
     if (norm.includes('mgb') || norm.includes('chuyên') || norm.includes('cơ sở')) {
       bdsTopics.push({ file, count });
-    } else {
-      bhTopics.push({ file, count });
     }
   });
 
-  const bdsTotal = bdsTopics.reduce((sum, t) => sum + t.count, 0);
-  const bhTotal = bhTopics.reduce((sum, t) => sum + t.count, 0);
+  // Sort: Cơ sở first, then Chuyên môn
+  bdsTopics.sort((a, b) => {
+    const normA = a.file.normalize('NFC').toLowerCase();
+    const normB = b.file.normalize('NFC').toLowerCase();
+    if (normA.includes('cơ sở')) return -1;
+    if (normB.includes('cơ sở')) return 1;
+    return 0;
+  });
 
-  // Render quick filter buttons
+  const bdsTotal = bdsTopics.reduce((sum, t) => sum + t.count, 0);
+
+  // Render quick filter buttons for MGBĐS
   if (elements.topicQuickFilters) {
     elements.topicQuickFilters.innerHTML = `
-      <button type="button" class="topic-filter-btn" data-filter="all">✨ Tất cả (${state.allQuestions.length} câu)</button>
-      <button type="button" class="topic-filter-btn" data-filter="bds">🏠 Chỉ BĐS (${bdsTotal} câu)</button>
-      <button type="button" class="topic-filter-btn" data-filter="bh">🛡️ Chỉ Bảo hiểm (${bhTotal} câu)</button>
-      <button type="button" class="topic-filter-btn active" data-filter="none">❌ Bỏ chọn tất cả</button>
+      <button type="button" class="topic-filter-btn" data-filter="all">✨ Cả 2 phần (${bdsTotal} câu)</button>
+      <button type="button" class="topic-filter-btn" data-filter="cs">📘 Phần Cơ sở (200 câu)</button>
+      <button type="button" class="topic-filter-btn" data-filter="cm">📙 Phần Chuyên môn (200 câu)</button>
+      <button type="button" class="topic-filter-btn active" data-filter="none">❌ Bỏ chọn</button>
     `;
 
     elements.topicQuickFilters.querySelectorAll('.topic-filter-btn').forEach(btn => {
@@ -124,13 +128,14 @@ function renderSetupTopics() {
         checkboxes.forEach(chk => {
           const file = chk.value;
           const norm = file.normalize('NFC').toLowerCase();
-          const isBds = norm.includes('mgb') || norm.includes('chuyên') || norm.includes('cơ sở');
+          const isCs = norm.includes('cơ sở');
+          const isCm = norm.includes('chuyên');
           const parent = chk.closest('.topic-item');
 
           let shouldCheck = false;
           if (mode === 'all') shouldCheck = true;
-          else if (mode === 'bds') shouldCheck = isBds;
-          else if (mode === 'bh') shouldCheck = !isBds;
+          else if (mode === 'cs') shouldCheck = isCs;
+          else if (mode === 'cm') shouldCheck = isCm;
           else if (mode === 'none') shouldCheck = false;
 
           chk.checked = shouldCheck;
@@ -149,13 +154,13 @@ function renderSetupTopics() {
   }
 
   // Helper to render items (default unchecked)
-  const renderItemHtml = (item, idx, prefix) => {
+  const renderItemHtml = (item, idx) => {
     const friendlyName = getFriendlyTopicName(item.file);
     const isChecked = state.selectedTopics.has(item.file);
     return `
       <label class="topic-item ${isChecked ? 'checked' : ''}" data-file="${item.file}">
         <div class="topic-item-left">
-          <input type="checkbox" ${isChecked ? 'checked' : ''} value="${item.file}" class="topic-checkbox" id="topic-chk-${prefix}-${idx}">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} value="${item.file}" class="topic-checkbox" id="topic-chk-${idx}">
           <span>${friendlyName}</span>
         </div>
         <span class="topic-count">${item.count} câu</span>
@@ -163,35 +168,17 @@ function renderSetupTopics() {
     `;
   };
 
-  let html = '';
-
-  if (bdsTopics.length > 0) {
-    html += `
-      <div class="topic-category-group">
-        <div class="topic-category-title">
-          <span>🏠 MÔI GIỚI BẤT ĐỘNG SẢN (MGBĐS)</span>
-          <span class="topic-category-count">${bdsTotal} câu</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          ${bdsTopics.map((t, idx) => renderItemHtml(t, idx, 'bds')).join('')}
-        </div>
+  let html = `
+    <div class="topic-category-group">
+      <div class="topic-category-title">
+        <span>🏠 CHUYÊN ĐỀ THI MÔI GIỚI BẤT ĐỘNG SẢN (MGBĐS)</span>
+        <span class="topic-category-count">${bdsTotal} câu</span>
       </div>
-    `;
-  }
-
-  if (bhTopics.length > 0) {
-    html += `
-      <div class="topic-category-group">
-        <div class="topic-category-title">
-          <span>🛡️ ĐẠI LÝ BẢO HIỂM NHÂN THỌ</span>
-          <span class="topic-category-count">${bhTotal} câu</span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-          ${bhTopics.map((t, idx) => renderItemHtml(t, idx, 'bh')).join('')}
-        </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        ${bdsTopics.map((t, idx) => renderItemHtml(t, idx)).join('')}
       </div>
-    `;
-  }
+    </div>
+  `;
 
   elements.topicListContainer.innerHTML = html;
 
@@ -218,18 +205,9 @@ function renderSetupTopics() {
 
 function getFriendlyTopicName(filename) {
   const norm = (filename || '').normalize('NFC').toLowerCase();
-  if (norm.includes('chuyên')) return "Phần 1: Kiến thức Chuyên môn MGBĐS (200 câu)";
-  if (norm.includes('cơ sở')) return "Phần 2: Kiến thức Cơ sở MGBĐS (200 câu)";
-  
-  const map = {
-    "P1_ThuatNgu_NguyenTac_BoSung.pdf": "Phần 1: Thuật ngữ & Nguyên tắc Bảo hiểm (106 câu)",
-    "P2_NghiepVu_BH.pdf": "Phần 2: Nghiệp vụ Bảo hiểm (147 câu)",
-    "P3_PhapLuat_KDBH.pdf": "Phần 3: Pháp luật Kinh doanh Bảo hiểm (58 câu)",
-    "P4_KenhPhanPhoi.pdf": "Phần 4: Kênh phân phối Bảo hiểm (50 câu)",
-    "P5_CauHoiBoSung.pdf": "Phần 5A: Câu hỏi Bổ sung (55 câu)",
-    "P5_TinhToan.pdf": "Phần 5B: Câu hỏi Tính toán (30 câu)"
-  };
-  return map[filename] || filename;
+  if (norm.includes('cơ sở')) return "📘 Phần 1: Kiến thức Cơ sở MGBĐS (200 câu)";
+  if (norm.includes('chuyên')) return "📙 Phần 2: Kiến thức Chuyên môn MGBĐS (200 câu)";
+  return filename;
 }
 
 function updateAvailableQuestionsCount() {
