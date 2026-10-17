@@ -80,22 +80,26 @@ async function initApp() {
   }
 }
 
-// Render topic checkboxes in Setup screen (showing only MGBĐS topics)
+// Render topic checkboxes in Setup screen with categories and quick filters
 function renderSetupTopics() {
   if (!elements.topicListContainer) return;
 
   const topicEntries = Object.entries(state.topics);
 
-  // Filter only MGBĐS topics
+  // Categorize topics
   const bdsTopics = [];
+  const bhTopics = [];
+
   topicEntries.forEach(([file, count]) => {
     const norm = (file || '').normalize('NFC').toLowerCase();
     if (norm.includes('mgb') || norm.includes('chuyên') || norm.includes('cơ sở')) {
       bdsTopics.push({ file, count });
+    } else {
+      bhTopics.push({ file, count });
     }
   });
 
-  // Sort: Cơ sở first, then Chuyên môn
+  // Sort BĐS: Cơ sở first, then Chuyên môn
   bdsTopics.sort((a, b) => {
     const normA = a.file.normalize('NFC').toLowerCase();
     const normB = b.file.normalize('NFC').toLowerCase();
@@ -104,18 +108,24 @@ function renderSetupTopics() {
     return 0;
   });
 
-  // Default: SELECT ALL visible MGBĐS topics
-  state.selectedTopics.clear();
-  bdsTopics.forEach(t => state.selectedTopics.add(t.file));
+  // Sort Bảo hiểm: P1 -> P2 -> P3 -> P4 -> P5
+  bhTopics.sort((a, b) => {
+    return (a.file || '').localeCompare(b.file || '');
+  });
 
   const bdsTotal = bdsTopics.reduce((sum, t) => sum + t.count, 0);
+  const bhTotal = bhTopics.reduce((sum, t) => sum + t.count, 0);
 
-  // Render quick filter buttons for MGBĐS
+  // Default: SELECT ALL Bảo hiểm topics (User requested to open Bảo hiểm question set)
+  state.selectedTopics.clear();
+  bhTopics.forEach(t => state.selectedTopics.add(t.file));
+
+  // Render quick filter buttons
   if (elements.topicQuickFilters) {
     elements.topicQuickFilters.innerHTML = `
-      <button type="button" class="topic-filter-btn active" data-filter="all">✨ Cả 2 phần (${bdsTotal} câu)</button>
-      <button type="button" class="topic-filter-btn" data-filter="cs">📘 Phần Cơ sở (200 câu)</button>
-      <button type="button" class="topic-filter-btn" data-filter="cm">📙 Phần Chuyên môn (200 câu)</button>
+      <button type="button" class="topic-filter-btn active" data-filter="bh">🛡️ Bộ đề Bảo hiểm (${bhTotal} câu)</button>
+      <button type="button" class="topic-filter-btn" data-filter="bds">🏠 Bộ đề Môi giới BĐS (${bdsTotal} câu)</button>
+      <button type="button" class="topic-filter-btn" data-filter="all">✨ Tất cả (${state.allQuestions.length} câu)</button>
       <button type="button" class="topic-filter-btn" data-filter="none">❌ Bỏ chọn</button>
     `;
 
@@ -130,14 +140,13 @@ function renderSetupTopics() {
         checkboxes.forEach(chk => {
           const file = chk.value;
           const norm = file.normalize('NFC').toLowerCase();
-          const isCs = norm.includes('cơ sở');
-          const isCm = norm.includes('chuyên');
+          const isBds = norm.includes('mgb') || norm.includes('chuyên') || norm.includes('cơ sở');
           const parent = chk.closest('.topic-item');
 
           let shouldCheck = false;
           if (mode === 'all') shouldCheck = true;
-          else if (mode === 'cs') shouldCheck = isCs;
-          else if (mode === 'cm') shouldCheck = isCm;
+          else if (mode === 'bh') shouldCheck = !isBds;
+          else if (mode === 'bds') shouldCheck = isBds;
           else if (mode === 'none') shouldCheck = false;
 
           chk.checked = shouldCheck;
@@ -150,19 +159,26 @@ function renderSetupTopics() {
           }
         });
 
+        // Auto adjust preset question pill if applicable
+        if (mode === 'bh') {
+          setRecommendedQuestions(40);
+        } else if (mode === 'bds') {
+          setRecommendedQuestions(30);
+        }
+
         updateAvailableQuestionsCount();
       });
     });
   }
 
-  // Helper to render items (default unchecked)
-  const renderItemHtml = (item, idx) => {
+  // Helper to render items
+  const renderItemHtml = (item, idx, prefix) => {
     const friendlyName = getFriendlyTopicName(item.file);
     const isChecked = state.selectedTopics.has(item.file);
     return `
       <label class="topic-item ${isChecked ? 'checked' : ''}" data-file="${item.file}">
         <div class="topic-item-left">
-          <input type="checkbox" ${isChecked ? 'checked' : ''} value="${item.file}" class="topic-checkbox" id="topic-chk-${idx}">
+          <input type="checkbox" ${isChecked ? 'checked' : ''} value="${item.file}" class="topic-checkbox" id="topic-chk-${prefix}-${idx}">
           <span>${friendlyName}</span>
         </div>
         <span class="topic-count">${item.count} câu</span>
@@ -170,17 +186,35 @@ function renderSetupTopics() {
     `;
   };
 
-  let html = `
-    <div class="topic-category-group">
-      <div class="topic-category-title">
-        <span>🏠 CHUYÊN ĐỀ THI MÔI GIỚI BẤT ĐỘNG SẢN (MGBĐS)</span>
-        <span class="topic-category-count">${bdsTotal} câu</span>
+  let html = '';
+
+  if (bhTopics.length > 0) {
+    html += `
+      <div class="topic-category-group">
+        <div class="topic-category-title">
+          <span>🛡️ ĐẠI LÝ BẢO HIỂM NHÂN THỌ</span>
+          <span class="topic-category-count">${bhTotal} câu</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${bhTopics.map((t, idx) => renderItemHtml(t, idx, 'bh')).join('')}
+        </div>
       </div>
-      <div style="display: flex; flex-direction: column; gap: 8px;">
-        ${bdsTopics.map((t, idx) => renderItemHtml(t, idx)).join('')}
+    `;
+  }
+
+  if (bdsTopics.length > 0) {
+    html += `
+      <div class="topic-category-group" style="margin-top: 18px;">
+        <div class="topic-category-title">
+          <span>🏠 MÔI GIỚI BẤT ĐỘNG SẢN (MGBĐS)</span>
+          <span class="topic-category-count">${bdsTotal} câu</span>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          ${bdsTopics.map((t, idx) => renderItemHtml(t, idx, 'bds')).join('')}
+        </div>
       </div>
-    </div>
-  `;
+    `;
+  }
 
   elements.topicListContainer.innerHTML = html;
 
@@ -199,9 +233,20 @@ function renderSetupTopics() {
       // Update quick filter buttons active state
       if (elements.topicQuickFilters) {
         elements.topicQuickFilters.querySelectorAll('.topic-filter-btn').forEach(b => b.classList.remove('active'));
-        if (state.selectedTopics.size === bdsTopics.length) {
+        const hasAllBh = bhTopics.length > 0 && bhTopics.every(t => state.selectedTopics.has(t.file));
+        const hasAnyBh = bhTopics.some(t => state.selectedTopics.has(t.file));
+        const hasAllBds = bdsTopics.length > 0 && bdsTopics.every(t => state.selectedTopics.has(t.file));
+        const hasAnyBds = bdsTopics.some(t => state.selectedTopics.has(t.file));
+
+        if (state.selectedTopics.size === state.allQuestions.length || (hasAllBh && hasAllBds)) {
           const allBtn = elements.topicQuickFilters.querySelector('[data-filter="all"]');
           if (allBtn) allBtn.classList.add('active');
+        } else if (hasAllBh && !hasAnyBds) {
+          const bhBtn = elements.topicQuickFilters.querySelector('[data-filter="bh"]');
+          if (bhBtn) bhBtn.classList.add('active');
+        } else if (hasAllBds && !hasAnyBh) {
+          const bdsBtn = elements.topicQuickFilters.querySelector('[data-filter="bds"]');
+          if (bdsBtn) bdsBtn.classList.add('active');
         } else if (state.selectedTopics.size === 0) {
           const noneBtn = elements.topicQuickFilters.querySelector('[data-filter="none"]');
           if (noneBtn) noneBtn.classList.add('active');
@@ -212,11 +257,33 @@ function renderSetupTopics() {
   });
 }
 
+function setRecommendedQuestions(num) {
+  if (elements.inputNumQuestions) {
+    elements.inputNumQuestions.value = num;
+  }
+  document.querySelectorAll('.preset-pill[data-num]').forEach(p => {
+    if (p.getAttribute('data-num') == num) {
+      p.classList.add('active');
+    } else {
+      p.classList.remove('active');
+    }
+  });
+}
+
 function getFriendlyTopicName(filename) {
   const norm = (filename || '').normalize('NFC').toLowerCase();
   if (norm.includes('cơ sở')) return "📘 Phần 1: Kiến thức Cơ sở MGBĐS (200 câu)";
   if (norm.includes('chuyên')) return "📙 Phần 2: Kiến thức Chuyên môn MGBĐS (200 câu)";
-  return filename;
+  
+  const map = {
+    "P1_ThuatNgu_NguyenTac_BoSung.pdf": "Phần 1: Thuật ngữ & Nguyên tắc Bảo hiểm (106 câu)",
+    "P2_NghiepVu_BH.pdf": "Phần 2: Nghiệp vụ Bảo hiểm (147 câu)",
+    "P3_PhapLuat_KDBH.pdf": "Phần 3: Pháp luật Kinh doanh Bảo hiểm (58 câu)",
+    "P4_KenhPhanPhoi.pdf": "Phần 4: Kênh phân phối Bảo hiểm (50 câu)",
+    "P5_CauHoiBoSung.pdf": "Phần 5A: Câu hỏi Bổ sung (55 câu)",
+    "P5_TinhToan.pdf": "Phần 5B: Câu hỏi Tính toán (30 câu)"
+  };
+  return map[filename] || filename;
 }
 
 function updateAvailableQuestionsCount() {
@@ -240,7 +307,7 @@ function updateAvailableQuestionsCount() {
     } else {
       const currentVal = parseInt(elements.inputNumQuestions.value) || 0;
       if (currentVal === 0 || currentVal > available.length) {
-        elements.inputNumQuestions.value = Math.min(30, available.length);
+        elements.inputNumQuestions.value = Math.min(40, available.length);
       }
     }
   }
